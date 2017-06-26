@@ -666,13 +666,18 @@ int input_read_parameters(
   class_call(parser_read_double(pfc,"omega_b",&param2,&flag2,errmsg),
              errmsg,
              errmsg);
-  class_test(((flag1 == _TRUE_) && (flag2 == _TRUE_)),
+  class_call(parser_read_double(pfc,"eta_b",&param3,&flag3,errmsg),
              errmsg,
-             "In input file, you can only enter one of Omega_b or omega_b, choose one");
+             errmsg);
+  class_test(((flag1 == _TRUE_) && (flag2 == _TRUE_) && (flag3 == _TRUE_)),
+             errmsg,
+             "In input file, you can only enter one of Omega_b, omega_b or eta_b, choose one");
   if (flag1 == _TRUE_)
     pba->Omega0_b = param1;
   if (flag2 == _TRUE_)
     pba->Omega0_b = param2/pba->h/pba->h;
+  if (flag3 == _TRUE_)
+    pba->Omega0_b = 1.81e6 * param3 * pow(pba->T_cmb ,3) / pba->h / pba->h;
 
   Omega_tot += pba->Omega0_b;
 
