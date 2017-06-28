@@ -37,6 +37,8 @@ cdef extern from "class.h":
         int index_bg_lum_distance
         int index_bg_conf_distance
         int index_bg_H
+        int index_bg_rho_smg
+        int index_bg_p_smg
         short long_info
         short inter_normal
         double T_cmb

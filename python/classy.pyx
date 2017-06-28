@@ -819,6 +819,62 @@ cdef class Class:
 
         return H
 
+    def w0_smg(self):
+        """
+        w0_smg()
+
+        Return the present value of the scalar field's equation of state
+        """
+        cdef double tau
+        cdef int last_index #junk
+        cdef double * pvecback
+
+        pvecback = <double*> calloc(self.ba.bg_size,sizeof(double))
+
+        z = 0
+
+        if background_tau_of_z(&self.ba,z,&tau)==_FAILURE_:
+            raise CosmoSevereError(self.ba.error_message)
+
+        if background_at_tau(&self.ba,tau,self.ba.long_info,self.ba.inter_normal,&last_index,pvecback)==_FAILURE_:
+            raise CosmoSevereError(self.ba.error_message)
+
+        w0 = pvecback[self.ba.index_bg_rho_smg]/pvecback[self.ba.index_bg_p_smg]
+
+        free(pvecback)
+
+        return w0
+
+    def wa_smg(self):
+        """
+        wa_smg()
+
+        Return the present value of the scalar field's equation of state
+        derivative (w_a s.t. w = w_0 + (1-a) w_a + ... )
+        """
+        cdef double tau
+        cdef int last_index #junk
+        cdef double * pvecback
+
+        pvecback = <double*> calloc(self.ba.bg_size,sizeof(double))
+
+        w = []
+        stepsize = 1e-3
+
+        for z in [0, stepsize]:
+            if background_tau_of_z(&self.ba,z,&tau)==_FAILURE_:
+                raise CosmoSevereError(self.ba.error_message)
+
+            if background_at_tau(&self.ba,tau,self.ba.long_info,self.ba.inter_normal,&last_index,pvecback)==_FAILURE_:
+                raise CosmoSevereError(self.ba.error_message)
+
+            w.append(pvecback[self.ba.index_bg_rho_smg]/pvecback[self.ba.index_bg_p_smg])
+
+        free(pvecback)
+
+        wa = (w[1] - w[0])/stepsize
+
+        return wa
     def ionization_fraction(self, z):
         """
         ionization_fraction(z)
